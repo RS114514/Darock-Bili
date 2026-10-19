@@ -19,12 +19,27 @@ jobs:
 
       - name: Build Watch App Archive
         run: |
-          xcodebuild archive             -project DarockBili.xcodeproj             -scheme "MeowBili Watch App"             -destination "generic/platform=watchOS"             -archivePath "build/MeowBiliWatch.xcarchive"             CODE_SIGN_IDENTITY="-"             AD_HOC_CODE_SIGNING_ALLOWED=YES             CODE_SIGNING_REQUIRED=NO             COMPILER_INDEX_STORE_ENABLE=NO             -skipMacroValidation
+          xcodebuild archive \
+            -project DarockBili.xcodeproj \
+            -scheme "MeowBili Watch App" \
+            -destination "generic/platform=watchOS" \
+            -archivePath "build/MeowBiliWatch.xcarchive" \
+            CODE_SIGN_IDENTITY="-" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            CODE_SIGNING_REQUIRED=NO \
+            SKIP_INSTALL=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            -skipMacroValidation
 
       - name: Package IPA
         run: |
           mkdir -p Payload
-          find build/MeowBiliWatch.xcarchive/Products -name "*.app" -maxdepth 3 -exec cp -r {} Payload/ \;
+          APP_DIR=$(find build/MeowBiliWatch.xcarchive -name "*.app" -type d | head -n 1)
+          if [ -z "$APP_DIR" ]; then
+            APP_DIR=$(find /Users/runner/Library/Developer/Xcode/DerivedData -name "喵哩喵哩.app" -type d | head -n 1)
+          fi
+          echo "Found app at: $APP_DIR"
+          cp -R "$APP_DIR" Payload/
           ls -la Payload/
           zip -r -q MeowBili_watchOS26.ipa Payload
 
