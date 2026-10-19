@@ -47,7 +47,11 @@ jobs:
             APP_DIR=$(find /Users/runner/Library/Developer/Xcode/DerivedData -name "喵哩喵哩.app" -type d | head -n 1)
           fi
           echo "Found watch app at: $APP_DIR"
-          cp -R "$APP_DIR" Payload/MeowBili.app/Watch/
+          cp -R "$APP_DIR" Payload/MeowBili.app/Watch/MeowBiliWatch.app
+          if [ -f "Payload/MeowBili.app/Watch/MeowBiliWatch.app/喵哩喵哩" ]; then
+            mv "Payload/MeowBili.app/Watch/MeowBiliWatch.app/喵哩喵哩" "Payload/MeowBili.app/Watch/MeowBiliWatch.app/MeowBiliWatch"
+            plutil -replace CFBundleExecutable -string "MeowBiliWatch" "Payload/MeowBili.app/Watch/MeowBiliWatch.app/Info.plist"
+          fi
 
           # 4. Verify Payload structure
           echo "=== Payload Structure ==="
