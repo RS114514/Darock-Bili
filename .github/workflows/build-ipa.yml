@@ -24,7 +24,8 @@ jobs:
       - name: Package IPA
         run: |
           mkdir -p Payload
-          cp -r build/MeowBiliWatch.xcarchive/Products/Applications/*.app Payload/
+          find build/MeowBiliWatch.xcarchive/Products -name "*.app" -maxdepth 3 -exec cp -r {} Payload/ \;
+          ls -la Payload/
           zip -r -q MeowBili_watchOS26.ipa Payload
 
       - name: Upload IPA Artifact

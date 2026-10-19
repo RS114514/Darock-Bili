@@ -932,12 +932,6 @@ struct VideoDetailView: View {
                             Spacer()
                         }
                     })
-                    .wrapIf({ if #available(watchOS 26.0, *) { true } else { false } }()) { content in
-                        if #available(watchOS 26.0, *) {
-                            content
-                                .buttonStyle(.glass)
-                        }
-                    }
                     .buttonBorderShape(.roundedRectangle(radius: 18))
                     .accessibilityIdentifier("AuthorDetailButton")
                 }
@@ -1003,12 +997,6 @@ struct VideoDetailView: View {
                                     .scaledToFit()
                             }
                         })
-                    }
-                    .wrapIf({ if #available(watchOS 26.0, *) { true } else { false } }()) { content in
-                        if #available(watchOS 26.0, *) {
-                            content
-                                .buttonStyle(.glass)
-                        }
                     }
                     .buttonBorderShape(.roundedRectangle(radius: 18))
                     .sheet(isPresented: $isFavoriteChoosePresented, content: { VideoFavoriteAddView(videoDetails: $videoDetails, isFavoured: $isFavoured) })

@@ -133,18 +133,10 @@ struct CommentsView: View {
                                     }
                                 }
                                 .padding()
-                                .wrapIf({ if #available(iOS 26.0, watchOS 26.0, *) { true } else { false } }()) { content in
-                                    if #available(iOS 26.0, watchOS 26.0, *) {
-                                        content
-                                            .glassEffect(in: RoundedRectangle(cornerRadius: 7))
-                                    }
-                                } else: { content in
-                                    content
-                                        .background {
-                                            RoundedRectangle(cornerRadius: 7)
-                                                .foregroundColor(.white)
-                                                .opacity(0.5)
-                                        }
+                                .background {
+                                    RoundedRectangle(cornerRadius: 7)
+                                        .foregroundColor(.white)
+                                        .opacity(0.5)
                                 }
                             }
                             HStack {

@@ -168,12 +168,6 @@ struct UserDynamicMainView: View {
                                                 .foregroundColor(.gray)
                                             }
                                         })
-                                        .wrapIf({ if #available(iOS 26.0, watchOS 26.0, *) { true } else { false } }()) { content in
-                                            if #available(iOS 26.0, watchOS 26.0, *) {
-                                                content
-                                                    .buttonStyle(.glass)
-                                            }
-                                        }
                                         .buttonBorderShape(.roundedRectangle(radius: 14))
                                     }
                                 } else if dynamics[i]["Type"]! as! BiliDynamicType == .forward {
@@ -294,24 +288,12 @@ struct UserDynamicMainView: View {
                                                                     .foregroundColor(.gray)
                                                                 }
                                                             })
-                                                            .wrapIf({ if #available(iOS 26.0, watchOS 26.0, *) { true } else { false } }()) { content in
-                                                                if #available(iOS 26.0, watchOS 26.0, *) {
-                                                                    content
-                                                                        .buttonStyle(.glass)
-                                                                }
-                                                            }
                                                             .buttonBorderShape(.roundedRectangle(radius: 14))
                                                             .disabled(true)
                                                         }
                                                     }
                                                 }
                                             })
-                                            .wrapIf({ if #available(iOS 26.0, watchOS 26.0, *) { true } else { false } }()) { content in
-                                                if #available(iOS 26.0, watchOS 26.0, *) {
-                                                    content
-                                                        .buttonStyle(.glass)
-                                                }
-                                            }
                                             .buttonBorderShape(.roundedRectangle(radius: 14))
                                         }
                                     }

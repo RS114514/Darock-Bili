@@ -287,12 +287,6 @@ func VideoCard(_ videoDetails: [String: String]) -> some View {
             .opacity(0.6)
         }
     })
-    .wrapIf({ if #available(watchOS 26.0, *) { true } else { false } }()) { content in
-        if #available(watchOS 26.0, *) {
-            content
-                .buttonStyle(.glass)
-        }
-    }
     .buttonBorderShape(.roundedRectangle(radius: 14))
 }
 
