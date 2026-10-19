@@ -33,14 +33,13 @@ jobs:
 
       - name: Build iOS Companion Host and Package IPA
         run: |
-          # 1. Compile minimal iOS 16 compatible host binary
-          xcrun --sdk iphoneos clang -arch arm64 -mios-version-min=16.0 -fobjc-arc -framework UIKit -framework Foundation -framework CoreGraphics iOSHost/main.m -o MeowBili
-          codesign --force --sign - MeowBili
-
-          # 2. Assemble standard iOS + watchOS bundle structure
+          # 1. Assemble standard iOS + watchOS bundle structure
           mkdir -p Payload/MeowBili.app/Watch
           cp iOSHost/Info.plist Payload/MeowBili.app/
-          cp MeowBili Payload/MeowBili.app/
+
+          # 2. Compile minimal iOS 16 compatible host binary directly into app bundle
+          xcrun --sdk iphoneos clang -arch arm64 -mios-version-min=16.0 -fobjc-arc -framework UIKit -framework Foundation -framework CoreGraphics iOSHost/main.m -o Payload/MeowBili.app/MeowBili
+          codesign --force --sign - Payload/MeowBili.app/MeowBili
 
           # 3. Locate and embed compiled watch app
           APP_DIR=$(find build/MeowBiliWatch.xcarchive -name "*.app" -type d | head -n 1)
