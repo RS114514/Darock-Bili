@@ -15,11 +15,11 @@ jobs:
 
       - name: Resolve Swift Packages
         run: |
-          xcodebuild -resolvePackageDependencies -project DarockBili.xcodeproj -scheme "MeowBili"
+          xcodebuild -resolvePackageDependencies -project DarockBili.xcodeproj -scheme "MeowBili" -skipMacroValidation
 
       - name: Build Archive
         run: |
-          xcodebuild archive             -project DarockBili.xcodeproj             -scheme "MeowBili"             -destination "generic/platform=iOS"             -archivePath "build/MeowBili.xcarchive"             CODE_SIGNING_ALLOWED=NO             CODE_SIGNING_REQUIRED=NO             CODE_SIGN_IDENTITY=""
+          xcodebuild archive             -project DarockBili.xcodeproj             -scheme "MeowBili"             -destination "generic/platform=iOS"             -archivePath "build/MeowBili.xcarchive"             CODE_SIGNING_ALLOWED=NO             CODE_SIGNING_REQUIRED=NO             CODE_SIGN_IDENTITY=""             COMPILER_INDEX_STORE_ENABLE=NO             -skipMacroValidation
 
       - name: Package IPA
         run: |
