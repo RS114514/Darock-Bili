@@ -74,7 +74,7 @@ struct Provider: TimelineProvider {
                     return MeowWidgetEntry(date: date, video: video)
                 }
                 
-                await withTaskGroup { group in
+                await withTaskGroup(of: Void.self) { group in
                     for (index, entry) in entries.enumerated() {
                         group.addTask {
                             let urlString = entry.video.coverImageURL.absoluteString
