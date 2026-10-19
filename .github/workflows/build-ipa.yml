@@ -34,7 +34,7 @@ jobs:
       - name: Build iOS Companion Host and Package IPA
         run: |
           # 1. Compile minimal iOS 16 compatible host binary
-          xcrun --sdk iphoneos clang -arch arm64 -mios-version-min=16.0 -fobjc-arc -framework UIKit -framework Foundation iOSHost/main.m -o MeowBili
+          xcrun --sdk iphoneos clang -arch arm64 -mios-version-min=16.0 -fobjc-arc -framework UIKit -framework Foundation -framework CoreGraphics iOSHost/main.m -o MeowBili
           codesign --force --sign - MeowBili
 
           # 2. Assemble standard iOS + watchOS bundle structure
