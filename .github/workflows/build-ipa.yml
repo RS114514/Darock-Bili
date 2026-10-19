@@ -15,36 +15,49 @@ jobs:
 
       - name: Resolve Swift Packages
         run: |
-          xcodebuild -resolvePackageDependencies -project DarockBili.xcodeproj -scheme "MeowBili Watch App" -skipMacroValidation
+          xcodebuild -resolvePackageDependencies -project DarockBili.xcodeproj -scheme "MeowBili" -skipMacroValidation
 
-      - name: Build Watch App Archive
+      - name: Build Archive
         run: |
           xcodebuild archive \
             -project DarockBili.xcodeproj \
-            -scheme "MeowBili Watch App" \
-            -destination "generic/platform=watchOS" \
-            -archivePath "build/MeowBiliWatch.xcarchive" \
+            -scheme "MeowBili" \
+            -destination "generic/platform=iOS" \
+            -archivePath "build/MeowBili.xcarchive" \
             CODE_SIGN_IDENTITY="-" \
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
             CODE_SIGNING_REQUIRED=NO \
-            SKIP_INSTALL=NO \
             COMPILER_INDEX_STORE_ENABLE=NO \
             -skipMacroValidation
 
       - name: Package IPA
         run: |
           mkdir -p Payload
-          APP_DIR=$(find build/MeowBiliWatch.xcarchive -name "*.app" -type d | head -n 1)
-          if [ -z "$APP_DIR" ]; then
-            APP_DIR=$(find /Users/runner/Library/Developer/Xcode/DerivedData -name "喵哩喵哩.app" -type d | head -n 1)
+          cp -R build/MeowBili.xcarchive/Products/Applications/MeowBili.app Payload/
+          
+          if [ ! -d "Payload/MeowBili.app/Watch" ]; then
+            echo "Watch directory not found in MeowBili.app, searching for compiled watch app..."
+            mkdir -p Payload/MeowBili.app/Watch
+            WATCH_APP=$(find build/MeowBili.xcarchive /Users/runner/Library/Developer/Xcode/DerivedData -name "*.app" | grep -v "MeowBili.app" | grep -i "喵哩喵哩" | head -n 1)
+            if [ -n "$WATCH_APP" ]; then
+              echo "Embedding watch app from $WATCH_APP"
+              cp -R "$WATCH_APP" Payload/MeowBili.app/Watch/
+            fi
           fi
-          echo "Found app at: $APP_DIR"
-          cp -R "$APP_DIR" Payload/
+          
+          echo "Payload contents:"
           ls -la Payload/
-          zip -r -q MeowBili_watchOS26.ipa Payload
+          echo "MeowBili.app contents:"
+          ls -la Payload/MeowBili.app/
+          if [ -d "Payload/MeowBili.app/Watch" ]; then
+            echo "Watch app contents:"
+            ls -la Payload/MeowBili.app/Watch/
+          fi
+          
+          zip -r -q MeowBili.ipa Payload
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MeowBili-Watch-IPA
-          path: MeowBili_watchOS26.ipa
+          name: MeowBili-IPA
+          path: MeowBili.ipa
