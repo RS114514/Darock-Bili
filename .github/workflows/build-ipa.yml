@@ -15,49 +15,52 @@ jobs:
 
       - name: Resolve Swift Packages
         run: |
-          xcodebuild -resolvePackageDependencies -project DarockBili.xcodeproj -scheme "MeowBili" -skipMacroValidation
+          xcodebuild -resolvePackageDependencies -project DarockBili.xcodeproj -scheme "MeowBili Watch App" -skipMacroValidation
 
-      - name: Build Archive
+      - name: Build Watch App Archive
         run: |
           xcodebuild archive \
             -project DarockBili.xcodeproj \
-            -scheme "MeowBili" \
-            -destination "generic/platform=iOS" \
-            -archivePath "build/MeowBili.xcarchive" \
+            -scheme "MeowBili Watch App" \
+            -destination "generic/platform=watchOS" \
+            -archivePath "build/MeowBiliWatch.xcarchive" \
             CODE_SIGN_IDENTITY="-" \
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
             CODE_SIGNING_REQUIRED=NO \
+            SKIP_INSTALL=NO \
             COMPILER_INDEX_STORE_ENABLE=NO \
             -skipMacroValidation
 
-      - name: Package IPA
+      - name: Build iOS Companion Host and Package IPA
         run: |
-          mkdir -p Payload
-          cp -R build/MeowBili.xcarchive/Products/Applications/MeowBili.app Payload/
-          
-          if [ ! -d "Payload/MeowBili.app/Watch" ]; then
-            echo "Watch directory not found in MeowBili.app, searching for compiled watch app..."
-            mkdir -p Payload/MeowBili.app/Watch
-            WATCH_APP=$(find build/MeowBili.xcarchive /Users/runner/Library/Developer/Xcode/DerivedData -name "*.app" | grep -v "MeowBili.app" | grep -i "喵哩喵哩" | head -n 1)
-            if [ -n "$WATCH_APP" ]; then
-              echo "Embedding watch app from $WATCH_APP"
-              cp -R "$WATCH_APP" Payload/MeowBili.app/Watch/
-            fi
+          # 1. Compile minimal iOS 16 compatible host binary
+          xcrun --sdk iphoneos clang -arch arm64 -mios-version-min=16.0 -fobjc-arc -framework UIKit -framework Foundation iOSHost/main.m -o MeowBili
+          codesign --force --sign - MeowBili
+
+          # 2. Assemble standard iOS + watchOS bundle structure
+          mkdir -p Payload/MeowBili.app/Watch
+          cp iOSHost/Info.plist Payload/MeowBili.app/
+          cp MeowBili Payload/MeowBili.app/
+
+          # 3. Locate and embed compiled watch app
+          APP_DIR=$(find build/MeowBiliWatch.xcarchive -name "*.app" -type d | head -n 1)
+          if [ -z "$APP_DIR" ]; then
+            APP_DIR=$(find /Users/runner/Library/Developer/Xcode/DerivedData -name "喵哩喵哩.app" -type d | head -n 1)
           fi
-          
-          echo "Payload contents:"
+          echo "Found watch app at: $APP_DIR"
+          cp -R "$APP_DIR" Payload/MeowBili.app/Watch/
+
+          # 4. Verify Payload structure
+          echo "=== Payload Structure ==="
           ls -la Payload/
-          echo "MeowBili.app contents:"
           ls -la Payload/MeowBili.app/
-          if [ -d "Payload/MeowBili.app/Watch" ]; then
-            echo "Watch app contents:"
-            ls -la Payload/MeowBili.app/Watch/
-          fi
-          
-          zip -r -q MeowBili.ipa Payload
+          ls -la Payload/MeowBili.app/Watch/
+
+          # 5. Package IPA
+          zip -r -q MeowBili_iOS_and_Watch.ipa Payload
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MeowBili-IPA
-          path: MeowBili.ipa
+          path: MeowBili_iOS_and_Watch.ipa
